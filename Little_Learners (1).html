@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Little Learners</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Comic Sans MS","Trebuchet MS",sans-serif;background:#fff8e7;color:#333}
+button,input{font:inherit}button{cursor:pointer}
+header{background:#ffcc4d;padding:16px 22px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 10px #0001}
+.logo{font-size:26px;font-weight:bold;color:#ff5c5c}.score{background:#fff;padding:9px 16px;border-radius:20px;font-weight:bold}
+.page{display:none;min-height:calc(100vh - 70px);padding:28px 18px}.active{display:block}
+.home{text-align:center;max-width:1050px;margin:auto}.home h1{font-size:42px;color:#ff6b6b;margin:15px 0 8px}.home p{font-size:19px;margin-bottom:28px}
+.menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:20px}
+.menu button{border:0;color:#fff;border-radius:28px;min-height:180px;padding:22px;font-size:22px;font-weight:bold;box-shadow:0 8px 16px #0002;transition:.2s}
+.menu button:hover{transform:translateY(-5px)}.emoji{display:block;font-size:58px;margin-bottom:10px}.words{background:#6095ff}.math{background:#61bd70}.memory{background:#9b67df}.fun{background:#ff895c}
+.content{max-width:900px;margin:auto}.back{border:0;background:#555;color:#fff;padding:9px 17px;border-radius:20px;margin-bottom:18px}.title{text-align:center;color:#ff6868;font-size:34px;margin-bottom:22px}
+.box{background:#fff;border-radius:28px;padding:30px;text-align:center;box-shadow:0 8px 20px #0001}.question{font-size:29px;margin-bottom:16px}.picture{font-size:95px;margin:10px}
+.answers{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.answer{border:0;background:#edf3ff;padding:16px;border-radius:18px;font-size:21px}.answer:hover{background:#d8e5ff}
+.feedback{font-size:22px;min-height:34px;margin:16px}.next,.check{border:0;padding:12px 25px;border-radius:22px;background:#ffbd32;font-weight:bold}
+.modes{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:20px}.mode{border:0;padding:10px 15px;border-radius:18px}.mode.active{background:#61bd70;color:#fff}
+.mathq{font-size:46px;font-weight:bold;margin:25px}.mathinput{width:170px;text-align:center;font-size:28px;padding:10px;border:3px solid #61bd70;border-radius:14px}.check{background:#61bd70;color:#fff;margin-top:14px}
+.memory-menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:15px}.set{border:0;background:#fff;padding:22px;border-radius:22px;box-shadow:0 5px 14px #0002;font-size:19px}.set span{display:block;font-size:45px;margin-bottom:8px}
+.board{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:620px;margin:auto}.card{border:0;border-radius:16px;background:#9565df;color:#fff;aspect-ratio:1;font-size:40px}.card.flipped{background:#fff;color:#333;border:3px solid #9565df}.card.matched{background:#86dc86}
+@media(max-width:600px){.home h1{font-size:32px}.answers{grid-template-columns:1fr}.mathq{font-size:36px}.board{gap:6px}.card{font-size:28px}}
+</style>
+</head>
+<body>
+<header><div class="logo">🌈 Little Learners</div><div class="score">⭐ Score: <span id="score">0</span></div></header>
+
+<section id="home" class="page active">
+<div class="home"><h1>🌟 Let's Learn & Play!</h1><p>Learn, answer and have fun!</p>
+<div class="menu">
+<button class="words" onclick="openPage('words')"><span class="emoji">📚</span>Words<br><small>Learn new words</small></button>
+<button class="math" onclick="openPage('math')"><span class="emoji">🔢</span>Maths<br><small>+ − × ÷</small></button>
+<button class="memory" onclick="openPage('memory')"><span class="emoji">🧠</span>Memory<br><small>Find matching pictures</small></button>
+<button class="fun" onclick="openPage('words')"><span class="emoji">🎮</span>Quick Quiz<br><small>Have fun!</small></button>
+</div></div></section>
+
+<section id="words" class="page"><div class="content"><button class="back" onclick="openPage('home')">← Home</button><h2 class="title">📚 Word Quiz</h2>
+<div class="box"><div class="question">What is this?</div><div class="picture" id="wp">🍎</div><div class="answers" id="wa"></div><div class="feedback" id="wf"></div><button class="next" onclick="wordQuestion()">Next ➡️</button></div></div></section>
+
+<section id="math" class="page"><div class="content"><button class="back" onclick="openPage('home')">← Home</button><h2 class="title">🔢 Maths Time!</h2>
+<div class="box"><div class="modes">
+<button class="mode active" onclick="mathMode='add';setActive(this);mathQuestion()">➕ Addition</button>
+<button class="mode" onclick="mathMode='sub';setActive(this);mathQuestion()">➖ Subtraction</button>
+<button class="mode" onclick="mathMode='mul';setActive(this);mathQuestion()">✖️ Multiplication</button>
+<button class="mode" onclick="mathMode='div';setActive(this);mathQuestion()">➗ Division</button>
+</div><div class="mathq" id="mq"></div><input id="mi" class="mathinput" type="number" placeholder="Answer"><br><button class="check" onclick="checkMath()">Check ✅</button><div class="feedback" id="mf"></div></div></div></section>
+
+<section id="memory" class="page"><div class="content"><button class="back" onclick="openPage('home')">← Home</button><h2 class="title">🧠 Memory Games</h2>
+<div id="memoryMenu" class="memory-menu"></div>
+<div id="memoryGame" style="display:none;text-align:center"><h3 id="mtitle" style="margin-bottom:18px"></h3><div id="board" class="board"></div><div class="feedback" id="memf"></div><button class="next" onclick="showMemoryMenu()">Choose Another Game</button></div>
+</div></section>
+
+<script>
+const words=[
+["🍎","Apple",["Apple","Ball","Cat","Sun"]],["🐶","Dog",["Dog","Fish","Car","Tree"]],
+["🐱","Cat",["Cat","Dog","Bird","Book"]],["🌞","Sun",["Moon","Sun","Star","Cloud"]],
+["🚗","Car",["Bus","Car","Bike","Train"]],["🍌","Banana",["Apple","Orange","Banana","Grape"]],
+["🐟","Fish",["Bird","Fish","Horse","Dog"]],["🌳","Tree",["Tree","Flower","House","Sun"]],
+["📚","Book",["Pen","Book","Bag","Chair"]],["⭐","Star",["Moon","Sun","Star","Cloud"]],
+["🚲","Bicycle",["Car","Bicycle","Boat","Plane"]],["🍊","Orange",["Orange","Apple","Banana","Pear"]],
+["🐘","Elephant",["Tiger","Elephant","Lion","Rabbit"]],["🌸","Flower",["Tree","Flower","Leaf","Grass"]],
+["✏️","Pencil",["Pen","Pencil","Book","Ruler"]],["🦁","Lion",["Lion","Tiger","Bear","Dog"]],
+["🐰","Rabbit",["Rabbit","Cat","Fox","Cow"]],["🥕","Carrot",["Carrot","Apple","Cake","Bread"]],
+["🍓","Strawberry",["Strawberry","Banana","Orange","Pear"]],["🚌","Bus",["Bus","Car","Train","Bike"]]
+];
+const sets=[
+["🐶 Animals",["🐶","🐱","🐭","🐹","🦊","🐻","🐼","🐸"]],
+["🍎 Fruits",["🍎","🍌","🍊","🍇","🍉","🍓","🍒","🍍"]],
+["🚗 Vehicles",["🚗","🚕","🚌","🚓","🚑","🚒","🚲","✈️"]],
+["🌈 Nature",["🌞","🌙","⭐","🌈","🌸","🌳","🌻","☁️"]],
+["⚽ Sports",["⚽","🏀","🏈","⚾","🎾","🏐","🥊","🏆"]],
+["🍕 Food",["🍕","🍔","🍟","🌭","🍩","🍪","🍉","🍰"]],
+["🚀 Space",["🚀","🌍","🌙","⭐","🪐","☄️","👽","🛰️"]],
+["🧸 Toys",["🧸","🪀","🪁","🎈","🎲","🧩","🚂","🎯"]]
+];
+let score=0,mathMode="add",mathAnswer=0,first=null,second=null,locked=false,matched=0;
+const $=id=>document.getElementById(id);
+function sound(type){try{let a=new(window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.frequency.value=type==="wrong"?220:type==="match"?900:type==="correct"?700:450;g.gain.value=.08;o.start();o.stop(a.currentTime+.16)}catch(e){}}
+function addScore(n){score+=n;$("score").textContent=score}
+function openPage(id){sound("click");document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));$(id).classList.add("active");if(id==="words")wordQuestion();if(id==="math")mathQuestion();if(id==="memory")showMemoryMenu()}
+function wordQuestion(){let x=words[Math.floor(Math.random()*words.length)];$("wp").textContent=x[0];$("wf").textContent="";let a=[...x[2]].sort(()=>Math.random()-.5);$("wa").innerHTML="";a.forEach(v=>{let b=document.createElement("button");b.className="answer";b.textContent=v;b.onclick=()=>{if(v===x[1]){$("wf").textContent="🎉 Correct!";sound("correct");addScore(10)}else{$("wf").textContent="😊 Try again!";sound("wrong")}};$("wa").appendChild(b)})}
+function setActive(b){document.querySelectorAll(".mode").forEach(x=>x.classList.remove("active"));b.classList.add("active");sound("click")}
+function rnd(n){return Math.floor(Math.random()*n)+1}
+function mathQuestion(){let a=rnd(12),b=rnd(12),q;if(mathMode==="add"){mathAnswer=a+b;q=`${a} + ${b} = ?`}if(mathMode==="sub"){if(b>a)[a,b]=[b,a];mathAnswer=a-b;q=`${a} − ${b} = ?`}if(mathMode==="mul"){mathAnswer=a*b;q=`${a} × ${b} = ?`}if(mathMode==="div"){mathAnswer=a;q=`${a*b} ÷ ${b} = ?`}$("mq").textContent=q;$("mi").value="";$("mf").textContent=""}
+function checkMath(){if(Number($("mi").value)===mathAnswer){$("mf").textContent="🎉 Excellent!";sound("correct");addScore(10);setTimeout(mathQuestion,700)}else{$("mf").textContent="🤔 Try again!";sound("wrong")}}
+function showMemoryMenu(){$("memoryGame").style.display="none";$("memoryMenu").style.display="grid";$("memoryMenu").innerHTML="";sets.forEach((s,i)=>{let b=document.createElement("button");b.className="set";b.innerHTML=`<span>${s[0].split(" ")[0]}</span>${s[0].substring(s[0].indexOf(" ")+1)}`;b.onclick=()=>startMemory(i);$("memoryMenu").appendChild(b)})}
+function startMemory(i){$("memoryMenu").style.display="none";$("memoryGame").style.display="block";$("mtitle").textContent=sets[i][0];$("memf").textContent="";let arr=[...sets[i][1],...sets[i][1]].sort(()=>Math.random()-.5);$("board").innerHTML="";first=second=null;locked=false;matched=0;arr.forEach(v=>{let c=document.createElement("button");c.className="card";c.dataset.v=v;c.textContent="❓";c.onclick=()=>flip(c);$("board").appendChild(c)})}
+function flip(c){if(locked||c===first||c.classList.contains("matched"))return;sound("click");c.classList.add("flipped");c.textContent=c.dataset.v;if(!first){first=c;return}second=c;locked=true;if(first.dataset.v===second.dataset.v){first.classList.add("matched");second.classList.add("matched");sound("match");addScore(5);matched++;first=second=null;locked=false;if(matched===8)$("memf").textContent="🎉 Amazing! You found all pairs!"}else{sound("wrong");setTimeout(()=>{first.classList.remove("flipped");second.classList.remove("flipped");first.textContent=second.textContent="❓";first=second=null;locked=false},700)}}
+wordQuestion();mathQuestion();showMemoryMenu();
+</script>
+</body>
+</html>
